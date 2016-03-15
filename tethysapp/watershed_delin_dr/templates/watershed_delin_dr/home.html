@@ -1,0 +1,40 @@
+{% extends "storage_capacity_service/base.html" %}
+{% load tethys_gizmos %}
+{% load staticfiles %}
+
+{% block styles %}
+{{ block.super }}
+<link href="{% static 'watershed_delin_dr/css/main.css' %}" rel="stylesheet"/>
+<link rel="stylesheet" href="{% static 'watershed_delin_dr/vendor/openlayers/v3.5.0-dist/ol.css' %}" type="text/css" />
+<style>
+    .ol-mouse-position {
+      top: 10px;
+      right: 40px;
+    }
+</style>
+{% endblock %}
+
+{% block app_navigation_items %}
+
+{% gizmo button btnDelin %}
+
+<div id="display-status"></div>
+
+{% endblock %}
+
+{% block app_content %}
+
+<div id="map"></div>
+
+{% endblock %}
+
+{% block app_actions %}
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% static 'watershed_delin_dr/vendor/openlayers/v3.5.0-dist/ol.js' %}"></script>
+  <script src="{% static 'watershed_delin_dr/vendor/proj4js/lib/proj4js-compressed.js' %}"></script>
+  <script src="{% static 'watershed_delin_dr/vendor/proj4js/lib/proj4js-combined.js' %}"></script>
+  <script src="{% static 'watershed_delin_dr/js/main.js' %}" type="text/javascript"></script>
+{% endblock %}
