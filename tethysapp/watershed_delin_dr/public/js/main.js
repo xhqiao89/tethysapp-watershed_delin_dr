@@ -77,21 +77,37 @@ $(document).ready(function () {
     map.getView().setZoom(8);
 
     map.on('click', function(evt) {
-        var coordinate = evt.coordinate;
-        addClickPoint(evt.coordinate);
 
-        //Proj4js.defs["EPSG:3395"]='+title=world mercator EPSG:3395 +proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs';
-        //var source = new Proj4js.Proj("EPSG:3857");
-        //var dest = new Proj4js.Proj("EPSG:3395");
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            return feature;
+        }, null, function(layer) {
+            return layer === river_layer;
+        });
+
+        if(feature){
+            //alert(feature);
+            addClickPoint(evt.coordinate);
+            var coordinate = evt.coordinate;
+            outlet_x = coordinate[0];
+            outlet_y = coordinate[1];
+            map.getView().setCenter(evt.coordinate);
+            map.getView().setZoom(18);
+        }
+
+        //var coordinate = evt.coordinate;
+        //addClickPoint(evt.coordinate);
         //
-        //var p = new Proj4js.Point(evt.coordinate[0],evt.coordinate[1]);   //any object will do as long as it has 'x' and 'y' properties
-        //var new_xy_3395 = Proj4js.transform(source, dest, p);      //do the transformation.  x and y are modified in place
-
-
-        outlet_x = coordinate[0];
-        outlet_y = coordinate[1];
-        map.getView().setCenter(evt.coordinate);
-        map.getView().setZoom(15);
+        ////Proj4js.defs["EPSG:3395"]='+title=world mercator EPSG:3395 +proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs';
+        ////var source = new Proj4js.Proj("EPSG:3857");
+        ////var dest = new Proj4js.Proj("EPSG:3395");
+        ////
+        ////var p = new Proj4js.Point(evt.coordinate[0],evt.coordinate[1]);   //any object will do as long as it has 'x' and 'y' properties
+        ////var new_xy_3395 = Proj4js.transform(source, dest, p);      //do the transformation.  x and y are modified in place
+        //
+        //outlet_x = coordinate[0];
+        //outlet_y = coordinate[1];
+        //map.getView().setCenter(evt.coordinate);
+        //map.getView().setZoom(15);
 
     })
 
@@ -136,6 +152,7 @@ function run_sc_service() {
     alert(outlet_y);
 
     basin_layer.getSource().clear();
+    $('#btnDelin').addClass('disabled');
 
     displayStatus.removeClass('error');
     displayStatus.addClass('calculating');
@@ -152,6 +169,7 @@ function run_sc_service() {
         },
         success: function (data) {
 
+            $('#btnDelin').removeClass('disabled');
             basin_layer.getSource().addFeatures(geojson2feature(data));
             displayStatus.removeClass('calculating');
             displayStatus.addClass('success');
@@ -159,6 +177,7 @@ function run_sc_service() {
 
         },
         error: function (jqXHR, textStatus, errorThrown) {
+            $('#btnDelin').removeClass('disabled');
             alert("Error");
             displayStatus.removeClass('calculating');
             displayStatus.addClass('error');
@@ -166,4 +185,42 @@ function run_sc_service() {
         }
     });
 
+}
+
+function run_geocoder() {
+    g = new google.maps.Geocoder();
+    myAddress=document.getElementById('txtLocation').value;
+    g.geocode({'address': myAddress}, geocoder_success);
+}
+
+function geocoder_success(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+        r=results;
+        flag_geocoded=true;
+        Lat = results[0].geometry.location.lat();
+        Lon = results[0].geometry.location.lng();
+
+        var dbPoint = {
+            "type": "Point",
+            "coordinates": [Lon, Lat]
+        }
+
+        var coords = ol.proj.transform(dbPoint.coordinates, 'EPSG:4326','EPSG:3857');
+        //addClickPoint(coords);
+        CenterMap(Lat,Lon);
+        map.getView().setZoom(12);
+
+        //map.getView().setZoom(14);
+        //run_point_indexing_service([Lon,Lat]);
+//        alert(results[0].formatted_address);
+    } else {
+        alert("Geocode was not successful for the following reason: " + status);
+    }
+}
+function handle_search_key(e) {
+    // Handle a key press in the location search text box.
+    // This handles pressing the enter key to initiate the search.
+    if (e.keyCode == 13) {
+        run_geocoder();
+    }
 }

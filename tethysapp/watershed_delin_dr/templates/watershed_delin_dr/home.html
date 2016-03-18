@@ -16,6 +16,12 @@
 
 {% block app_navigation_items %}
 
+{% gizmo text_input txtLocation %}
+
+{% gizmo button btnSearch %}
+
+<br><br>
+
 {% gizmo button btnDelin %}
 
 <div id="display-status"></div>
@@ -37,4 +43,7 @@
   <script src="{% static 'watershed_delin_dr/vendor/proj4js/lib/proj4js-compressed.js' %}"></script>
   <script src="{% static 'watershed_delin_dr/vendor/proj4js/lib/proj4js-combined.js' %}"></script>
   <script src="{% static 'watershed_delin_dr/js/main.js' %}" type="text/javascript"></script>
+    <script type="text/javascript"
+         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPgvDUpbEwcbg9C0cRTfDtDa-Vj4WBwI0">
+    </script>
 {% endblock %}

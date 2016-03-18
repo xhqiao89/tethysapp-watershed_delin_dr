@@ -28,10 +28,23 @@ def home(request):
 
     btnDelin = Button(display_text="Delineate Watershed",
                         name="btnDelin",
-                        attributes="onclick=run_sc_service()",
+                        attributes="id=btnDelin onclick=run_sc_service()",
                         submit=False)
 
-    context = {'btnDelin': btnDelin
+    txtLocation = TextInput(display_text='Location Search:',
+                    name="txtLocation",
+                    initial="",
+                    disabled=False,
+                    attributes="onkeypress=handle_search_key(event);")
+
+    btnSearch = Button(display_text="Search",
+                        name="btnSearch",
+                        attributes="onclick=run_geocoder();",
+                        submit=False)
+
+    context = {'btnDelin': btnDelin,
+               'txtLocation': txtLocation,
+               'btnSearch': btnSearch
                }
 
     return render(request,'watershed_delin_dr/home.html', context)
